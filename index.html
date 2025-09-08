@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. Abraham S. Borbor Memorial School Of Excellence - E-Portal</title>
+<style>
+  /* --- General Styles --- */
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: #fff;
+  }
+  a { text-decoration: none; color: #fff; }
+  h1, h2, h3 { margin: 0; }
+  button { cursor: pointer; }
+
+  /* --- Header --- */
+  header {
+    background: #111;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  header h1 { font-size: 2em; color: #00e5ff; }
+
+  /* --- Container --- */
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.05);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  }
+
+  /* --- Form Styles --- */
+  input[type=text], input[type=password], input[type=email] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border: none;
+    border-radius: 8px;
+  }
+  button {
+    background: #00e5ff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #000;
+    transition: 0.3s;
+  }
+  button:hover { background: #00bcd4; color: #fff; }
+
+  /* --- Dashboard --- */
+  .dashboard { display: none; }
+  .dashboard h2 { color: #ffde59; margin-bottom: 20px; }
+  .dashboard .card {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+
+  /* --- Alerts --- */
+  .alert {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    color: #000;
+    display: none;
+  }
+  .alert.success { background: #00ff7f; }
+  .alert.error { background: #ff4d4d; }
+
+  /* --- Responsive --- */
+  @media(max-width: 600px){
+    .container { margin: 20px; padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Dr. Abraham S. Borbor Memorial School Of Excellence</h1>
+  <p>E-Portal System</p>
+</header>
+
+<div class="container">
+  <!-- Login Form -->
+  <div id="loginForm">
+    <h2>Login</h2>
+    <div class="alert" id="loginAlert"></div>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p style="margin-top:15px;">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+  </div>
+
+  <!-- Registration Form -->
+  <div id="registerForm" style="display:none;">
+    <h2>Register</h2>
+    <div class="alert" id="registerAlert"></div>
+    <input type="text" id="regName" placeholder="Full Name" required>
+    <input type="email" id="regEmail" placeholder="Email" required>
+    <input type="text" id="regUsername" placeholder="Username" required>
+    <input type="password" id="regPassword" placeholder="Password" required>
+    <button onclick="register()">Register</button>
+    <p style="margin-top:15px;">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <h2>Welcome, <span id="userDisplay"></span>!</h2>
+    <div class="card">
+      <h3>Student Information</h3>
+      <p id="studentInfo">Your details will appear here.</p>
+    </div>
+    <div class="card">
+      <h3>School Announcements</h3>
+      <ul>
+        <li>Welcome to the new academic session!</li>
+        <li>WASSCE registration is open now.</li>
+        <li>Parent-Teacher meeting scheduled next week.</li>
+      </ul>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<script>
+  // --- Local Storage for Demo ---
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+
+  function showRegister(){
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+  }
+  function showLogin(){
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+  }
+
+  function register(){
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const username = document.getElementById('regUsername').value;
+    const password = document.getElementById('regPassword').value;
+    const alertBox = document.getElementById('registerAlert');
+
+    if(!name || !email || !username || !password){
+      alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='All fields required'; return;
+    }
+
+    if(users.find(u => u.username === username)){
+      alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='Username already exists'; return;
+    }
+
+    users.push({name,email,username,password});
+    localStorage.setItem('users', JSON.stringify(users));
+    alertBox.style.display='block'; alertBox.className='alert success'; alertBox.innerText='Registration Successful! You can now login.';
+    setTimeout(showLogin, 1500);
+  }
+
+  function login(){
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const alertBox = document.getElementById('loginAlert');
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if(user){
+      document.getElementById('loginForm').style.display='none';
+      document.getElementById('dashboard').style.display='block';
+      document.getElementById('userDisplay').innerText = user.name;
+      document.getElementById('studentInfo').innerHTML = `<b>Username:</b> ${user.username}<br><b>Email:</b> ${user.email}`;
+    } else {
+      alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='Invalid credentials';
+    }
+  }
+
+  function logout(){
+    document.getElementById('dashboard').style.display='none';
+    document.getElementById('loginForm').style.display='block';
+  }
+</script>
+
+</body>
+</html>
