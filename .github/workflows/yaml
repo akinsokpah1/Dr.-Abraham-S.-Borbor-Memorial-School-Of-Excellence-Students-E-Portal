@@ -1,0 +1,59 @@
+name: Deploy Advanced E-Portal to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Pages
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # Step 3: Install Node.js (needed for HTML minification)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      # Step 4: Minify index.html
+      - name: Minify HTML
+        run: |
+          npm install -g html-minifier
+          html-minifier --collapse-whitespace --remove-comments --minify-css true --minify-js true -o index.min.html index.html
+          mv index.min.html index.html
+
+      # Step 5: Upload artifact to GitHub Pages
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      # Step 6: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Step 7: Deployment Status
+      - name: Deployment URL
+        run: echo "E-Portal deployed at: ${{ steps.deployment.outputs.page_url }}"
