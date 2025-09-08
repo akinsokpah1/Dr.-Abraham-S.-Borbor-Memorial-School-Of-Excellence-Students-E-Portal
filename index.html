@@ -3,98 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dr. Abraham S. Borbor Memorial School Of Excellence - E-Portal</title>
+<title>Dr. Abraham S. Borbor Memorial School Of Excellence - Advanced E-Portal</title>
 <style>
   /* --- General Styles --- */
   body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-    color: #fff;
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f2027; color: #fff;
   }
-  a { text-decoration: none; color: #fff; }
-  h1, h2, h3 { margin: 0; }
-  button { cursor: pointer; }
+  a { text-decoration: none; color: #00e5ff; }
+  h1,h2,h3{margin:0;}
+  button{cursor:pointer; transition:.3s;}
 
   /* --- Header --- */
   header {
-    background: #111;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    background: #111; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
   header h1 { font-size: 2em; color: #00e5ff; }
+  header p { margin-top: 5px; color: #ccc; }
 
   /* --- Container --- */
   .container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: rgba(255,255,255,0.05);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    max-width: 1000px; margin: 40px auto; background: rgba(255,255,255,0.05);
+    padding: 30px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
   }
 
-  /* --- Form Styles --- */
-  input[type=text], input[type=password], input[type=email] {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0 20px 0;
-    border: none;
-    border-radius: 8px;
+  /* --- Forms --- */
+  input, select {
+    width: 100%; padding: 12px; margin: 10px 0 20px 0; border:none; border-radius:8px;
   }
   button {
-    background: #00e5ff;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 8px;
-    font-size: 1em;
-    color: #000;
-    transition: 0.3s;
+    background:#00e5ff; border:none; padding:12px 25px; border-radius:8px; color:#000;
   }
-  button:hover { background: #00bcd4; color: #fff; }
+  button:hover { background:#00bcd4; color:#fff; }
 
   /* --- Dashboard --- */
-  .dashboard { display: none; }
-  .dashboard h2 { color: #ffde59; margin-bottom: 20px; }
-  .dashboard .card {
-    background: rgba(255,255,255,0.1);
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-  }
+  .dashboard { display:none; }
+  .dashboard h2 { color:#ffde59; margin-bottom:15px; }
+  .dashboard .card { background: rgba(255,255,255,0.1); padding:20px; border-radius:10px; margin-bottom:15px; }
+  .flex { display:flex; flex-wrap:wrap; gap:15px; }
+  .card.small { flex:1 1 calc(50% - 20px); }
 
   /* --- Alerts --- */
-  .alert {
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    color: #000;
-    display: none;
-  }
-  .alert.success { background: #00ff7f; }
-  .alert.error { background: #ff4d4d; }
+  .alert { padding:10px; margin-bottom:20px; border-radius:8px; color:#000; display:none; }
+  .alert.success { background:#00ff7f; }
+  .alert.error { background:#ff4d4d; }
 
   /* --- Responsive --- */
-  @media(max-width: 600px){
-    .container { margin: 20px; padding: 20px; }
-  }
+  @media(max-width:600px){ .container{margin:20px; padding:20px;} .card.small{flex:1 1 100%;} }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Dr. Abraham S. Borbor Memorial School Of Excellence</h1>
-  <p>E-Portal System</p>
+  <p>Advanced E-Portal System</p>
 </header>
 
 <div class="container">
+
   <!-- Login Form -->
   <div id="loginForm">
     <h2>Login</h2>
     <div class="alert" id="loginAlert"></div>
     <input type="text" id="username" placeholder="Username" required>
     <input type="password" id="password" placeholder="Password" required>
+    <select id="role">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher/Admin</option>
+    </select>
     <button onclick="login()">Login</button>
     <p style="margin-top:15px;">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
   </div>
@@ -107,6 +83,10 @@
     <input type="email" id="regEmail" placeholder="Email" required>
     <input type="text" id="regUsername" placeholder="Username" required>
     <input type="password" id="regPassword" placeholder="Password" required>
+    <select id="regRole">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher/Admin</option>
+    </select>
     <button onclick="register()">Register</button>
     <p style="margin-top:15px;">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
   </div>
@@ -114,75 +94,133 @@
   <!-- Dashboard -->
   <div class="dashboard" id="dashboard">
     <h2>Welcome, <span id="userDisplay"></span>!</h2>
-    <div class="card">
-      <h3>Student Information</h3>
-      <p id="studentInfo">Your details will appear here.</p>
+
+    <!-- Admin/Teacher Panel -->
+    <div id="adminPanel" style="display:none;">
+      <div class="card">
+        <h3>Manage Students</h3>
+        <input type="text" id="studentName" placeholder="Student Name">
+        <input type="text" id="studentUsername" placeholder="Student Username">
+        <input type="text" id="studentGrade" placeholder="Grade">
+        <button onclick="addGrade()">Add/Update Grade</button>
+        <ul id="gradesList"></ul>
+      </div>
+      <div class="card">
+        <h3>Announcements</h3>
+        <input type="text" id="announcementText" placeholder="New announcement">
+        <button onclick="addAnnouncement()">Post Announcement</button>
+        <ul id="announcementsList"></ul>
+      </div>
     </div>
-    <div class="card">
-      <h3>School Announcements</h3>
-      <ul>
-        <li>Welcome to the new academic session!</li>
-        <li>WASSCE registration is open now.</li>
-        <li>Parent-Teacher meeting scheduled next week.</li>
-      </ul>
+
+    <!-- Student Panel -->
+    <div id="studentPanel" style="display:none;">
+      <div class="card">
+        <h3>Your Info</h3>
+        <p id="studentInfo"></p>
+      </div>
+      <div class="card">
+        <h3>Your Grades</h3>
+        <ul id="studentGrades"></ul>
+      </div>
+      <div class="card">
+        <h3>Announcements</h3>
+        <ul id="studentAnnouncements"></ul>
+      </div>
     </div>
+
     <button onclick="logout()">Logout</button>
   </div>
 </div>
 
 <script>
-  // --- Local Storage for Demo ---
-  const users = JSON.parse(localStorage.getItem('users')) || [];
+  // --- Persistent Storage ---
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+  let grades = JSON.parse(localStorage.getItem('grades')) || [];
+  let announcements = JSON.parse(localStorage.getItem('announcements')) || [];
 
-  function showRegister(){
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-  }
-  function showLogin(){
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('loginForm').style.display = 'block';
-  }
+  function showRegister(){ document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; }
+  function showLogin(){ document.getElementById('registerForm').style.display='none'; document.getElementById('loginForm').style.display='block'; }
 
   function register(){
     const name = document.getElementById('regName').value;
     const email = document.getElementById('regEmail').value;
     const username = document.getElementById('regUsername').value;
     const password = document.getElementById('regPassword').value;
+    const role = document.getElementById('regRole').value;
     const alertBox = document.getElementById('registerAlert');
 
-    if(!name || !email || !username || !password){
-      alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='All fields required'; return;
-    }
+    if(!name||!email||!username||!password){ alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='All fields required'; return; }
+    if(users.find(u=>u.username===username)){ alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='Username exists'; return; }
 
-    if(users.find(u => u.username === username)){
-      alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='Username already exists'; return;
-    }
-
-    users.push({name,email,username,password});
-    localStorage.setItem('users', JSON.stringify(users));
-    alertBox.style.display='block'; alertBox.className='alert success'; alertBox.innerText='Registration Successful! You can now login.';
-    setTimeout(showLogin, 1500);
+    users.push({name,email,username,password,role});
+    localStorage.setItem('users',JSON.stringify(users));
+    alertBox.style.display='block'; alertBox.className='alert success'; alertBox.innerText='Registered! You can now login.';
+    setTimeout(showLogin,1500);
   }
 
   function login(){
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
     const alertBox = document.getElementById('loginAlert');
 
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(u=>u.username===username && u.password===password && u.role===role);
     if(user){
       document.getElementById('loginForm').style.display='none';
       document.getElementById('dashboard').style.display='block';
       document.getElementById('userDisplay').innerText = user.name;
-      document.getElementById('studentInfo').innerHTML = `<b>Username:</b> ${user.username}<br><b>Email:</b> ${user.email}`;
-    } else {
-      alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='Invalid credentials';
-    }
+
+      if(role==='teacher'){ document.getElementById('adminPanel').style.display='block'; document.getElementById('studentPanel').style.display='none'; loadAdminData(); }
+      else{ document.getElementById('adminPanel').style.display='none'; document.getElementById('studentPanel').style.display='block'; loadStudentData(user.username); }
+
+    } else { alertBox.style.display='block'; alertBox.className='alert error'; alertBox.innerText='Invalid credentials'; }
   }
 
-  function logout(){
-    document.getElementById('dashboard').style.display='none';
-    document.getElementById('loginForm').style.display='block';
+  function logout(){ document.getElementById('dashboard').style.display='none'; document.getElementById('loginForm').style.display='block'; }
+
+  // --- Admin Functions ---
+  function addGrade(){
+    const name = document.getElementById('studentName').value;
+    const username = document.getElementById('studentUsername').value;
+    const grade = document.getElementById('studentGrade').value;
+
+    if(!name||!username||!grade) return alert('All fields required');
+
+    const existing = grades.find(g=>g.username===username);
+    if(existing){ existing.grade = grade; existing.name=name; } 
+    else { grades.push({username,name,grade}); }
+    localStorage.setItem('grades',JSON.stringify(grades));
+    loadAdminData();
+  }
+
+  function addAnnouncement(){
+    const text = document.getElementById('announcementText').value;
+    if(!text) return;
+    announcements.push({text,date:new Date().toLocaleString()});
+    localStorage.setItem('announcements',JSON.stringify(announcements));
+    document.getElementById('announcementText').value='';
+    loadAdminData();
+  }
+
+  function loadAdminData(){
+    const gradesList = document.getElementById('gradesList'); gradesList.innerHTML='';
+    grades.forEach(g=>{ const li=document.createElement('li'); li.innerText=`${g.name} (${g.username}): ${g.grade}`; gradesList.appendChild(li); });
+
+    const announcementsList = document.getElementById('announcementsList'); announcementsList.innerHTML='';
+    announcements.slice().reverse().forEach(a=>{ const li=document.createElement('li'); li.innerText=`[${a.date}] ${a.text}`; announcementsList.appendChild(li); });
+  }
+
+  // --- Student Functions ---
+  function loadStudentData(username){
+    const user = users.find(u=>u.username===username);
+    document.getElementById('studentInfo').innerHTML=`<b>Name:</b> ${user.name}<br><b>Email:</b> ${user.email}`;
+
+    const studentGrades = document.getElementById('studentGrades'); studentGrades.innerHTML='';
+    grades.filter(g=>g.username===username).forEach(g=>{ const li=document.createElement('li'); li.innerText=`Course: ${g.name} - Grade: ${g.grade}`; studentGrades.appendChild(li); });
+
+    const studentAnnouncements = document.getElementById('studentAnnouncements'); studentAnnouncements.innerHTML='';
+    announcements.slice().reverse().forEach(a=>{ const li=document.createElement('li'); li.innerText=`[${a.date}] ${a.text}`; studentAnnouncements.appendChild(li); });
   }
 </script>
 
