@@ -4,32 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dr. Abraham S. Borbor Memorial School Of Excellence - E-Portal</title>
-<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  /* --- General Styles --- */
-  body { margin:0; font-family:'Segoe UI',sans-serif; transition:background 0.3s, color 0.3s;}
-  a{text-decoration:none; color:#00e5ff;} h1,h2,h3{margin:0;} button{cursor:pointer; transition:.3s;}
+  body { margin:0; font-family:'Segoe UI',sans-serif; transition:background 0.3s,color 0.3s;}
   header { background:#111; padding:20px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.3);}
-  header h1{font-size:2em; color:#00e5ff;} header p{margin-top:5px; color:#ccc;}
+  header h1{color:#00e5ff; margin:5px 0;}
+  header p{color:#ccc; margin:0;}
+  .theme-toggle{position:absolute; top:20px; right:20px; padding:10px 15px; border-radius:8px; background:#00e5ff; color:#000; font-weight:bold;}
   .container{max-width:1000px; margin:40px auto; background:rgba(255,255,255,0.05); padding:30px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5);}
   input, select{width:100%; padding:12px; margin:10px 0 20px 0; border:none; border-radius:8px;}
-  button{background:#00e5ff; border:none; padding:12px 25px; border-radius:8px; color:#000;}
-  button:hover{background:#00bcd4;color:#fff;}
-  .dashboard{display:none;} .dashboard h2{color:#ffde59; margin-bottom:15px;}
-  .dashboard .card{background: rgba(255,255,255,0.1); padding:20px; border-radius:10px; margin-bottom:15px; transition: transform 0.3s;}
-  .dashboard .card:hover{transform: translateY(-5px);}
-  .flex{display:flex; flex-wrap:wrap; gap:15px;} .card.small{flex:1 1 calc(50% - 20px);}
+  button{background:#00e5ff; border:none; padding:12px 25px; border-radius:8px; color:#000; cursor:pointer; transition:.3s;}
+  button:hover{background:#00bcd4; color:#fff;}
+  .dashboard{display:none;}
+  .dashboard h2{color:#ffde59; margin-bottom:15px;}
+  .dashboard .card{background:rgba(255,255,255,0.1); padding:20px; border-radius:10px; margin-bottom:15px; transition:transform 0.3s;}
+  .dashboard .card:hover{transform:translateY(-5px);}
+  .flex{display:flex; flex-wrap:wrap; gap:15px;}
+  .card.small{flex:1 1 calc(50% - 20px);}
   .alert{padding:10px; margin-bottom:20px; border-radius:8px; color:#000; display:none;}
   .alert.success{background:#00ff7f;} .alert.error{background:#ff4d4d;}
-  .theme-toggle{position:absolute; top:20px; right:20px; padding:10px 15px; border-radius:8px; background:#00e5ff; color:#000; font-weight:bold;}
   @media(max-width:600px){ .container{margin:20px; padding:20px;} .card.small{flex:1 1 100%;} }
 </style>
 </head>
 <body>
-
 <header>
-  <!-- School Logo -->
   <img src="data:image/png;base64,PUT_YOUR_BASE64_LOGO_HERE" alt="School Logo" style="height:80px; display:block; margin:0 auto 10px auto;">
   <h1>Dr. Abraham S. Borbor Memorial School Of Excellence</h1>
   <p>Advanced E-Portal System</p>
@@ -42,30 +40,30 @@
   <div id="loginForm">
     <h2>Login</h2>
     <div class="alert" id="loginAlert"></div>
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
     <select id="role">
       <option value="student">Student</option>
       <option value="teacher">Teacher/Admin</option>
     </select>
     <button onclick="login()">Login</button>
-    <p style="margin-top:15px;">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+    <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
   </div>
 
   <!-- Registration Form -->
   <div id="registerForm" style="display:none;">
     <h2>Register</h2>
     <div class="alert" id="registerAlert"></div>
-    <input type="text" id="regName" placeholder="Full Name" required>
-    <input type="email" id="regEmail" placeholder="Email" required>
-    <input type="text" id="regUsername" placeholder="Username" required>
-    <input type="password" id="regPassword" placeholder="Password" required>
+    <input type="text" id="regName" placeholder="Full Name">
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="text" id="regUsername" placeholder="Username">
+    <input type="password" id="regPassword" placeholder="Password">
     <select id="regRole">
       <option value="student">Student</option>
       <option value="teacher">Teacher/Admin</option>
     </select>
     <button onclick="register()">Register</button>
-    <p style="margin-top:15px;">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
   </div>
 
   <!-- Dashboard -->
@@ -192,7 +190,7 @@ function addGrade(){
   const course=document.getElementById('courseSelectAdmin').value;
   if(!sname||!suser||!grade||!course) return alert('All fields required');
   const existing=grades.find(g=>g.username===suser && g.course===course);
-  if(existing){existing.grade=grade; existing.name=sname;} 
+  if(existing){existing.grade=Number(grade); existing.name=sname;} 
   else{grades.push({username:suser,name:sname,course,grade:Number(grade)});}
   localStorage.setItem('grades',JSON.stringify(grades));
   loadAdminData();
@@ -219,17 +217,14 @@ function enrollCourse(){
 }
 
 function loadAdminData(){
-  // Courses list
   const courseSelectAdmin=document.getElementById('courseSelectAdmin');
   const coursesList=document.getElementById('coursesList');
   courseSelectAdmin.innerHTML=''; coursesList.innerHTML='';
   courses.forEach(c=>{ const opt=document.createElement('option'); opt.value=c; opt.innerText=c; courseSelectAdmin.appendChild(opt); const li=document.createElement('li'); li.innerText=c; coursesList.appendChild(li); });
 
-  // Grades list
   const gradesList=document.getElementById('gradesList'); gradesList.innerHTML='';
   grades.forEach(g=>{ const li=document.createElement('li'); li.innerText=`${g.name} (${g.username}) - ${g.course}: ${g.grade}`; gradesList.appendChild(li); });
 
-  // Announcements
   const announcementsList=document.getElementById('announcementsList'); announcementsList.innerHTML='';
   announcements.slice().reverse().forEach(a=>{ const li=document.createElement('li'); li.innerText=`[${a.date}] ${a.text}`; announcementsList.appendChild(li); });
 }
@@ -238,23 +233,26 @@ function loadStudentData(username){
   const user=users.find(u=>u.username===username);
   document.getElementById('studentInfo').innerHTML=`<b>Name:</b> ${user.name}<br><b>Email:</b> ${user.email}`;
 
-  // Courses
   const courseSelectStudent=document.getElementById('courseSelectStudent');
   const studentCourses=document.getElementById('studentCourses'); studentCourses.innerHTML=''; courseSelectStudent.innerHTML='';
   courses.forEach(c=>{ const opt=document.createElement('option'); opt.value=c; opt.innerText=c; courseSelectStudent.appendChild(opt); });
   grades.filter(g=>g.username===username).forEach(g=>{ const li=document.createElement('li'); li.innerText=`${g.course}: ${g.grade}`; studentCourses.appendChild(li); });
 
-  // Announcements
   const studentAnnouncements=document.getElementById('studentAnnouncements'); studentAnnouncements.innerHTML='';
   announcements.slice().reverse().forEach(a=>{ const li=document.createElement('li'); li.innerText=`[${a.date}] ${a.text}`; studentAnnouncements.appendChild(li); });
 
-  // Grade Chart
   const ctx=document.getElementById('gradeChart').getContext('2d');
   const chartData=grades.filter(g=>g.username===username).map(g=>({label:g.course, value:g.grade}));
-  new Chart(ctx,{type:'bar',data:{labels:chartData.map(d=>d.label), datasets:[{label:'Grades', data:chartData.map(d=>d.value), backgroundColor:'#00e5ff'}]}, options:{scales:{y:{beginAtZero:true}}}});
+  if(window.gradeChart) window.gradeChart.destroy();
+  window.gradeChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:chartData.map(d=>d.label),
+      datasets:[{label:'Grades', data:chartData.map(d=>d.value), backgroundColor:'#00e5ff'}]
+    },
+    options:{scales:{y:{beginAtZero:true}}}
+  });
 }
-
 </script>
-
 </body>
 </html>
